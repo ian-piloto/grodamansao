@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Be+Vietnam+Pro:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "neon-pink": "#FF007F",
+                        "neon-green": "#39FF14"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .neon-border { border-color: rgba(57, 255, 20, 0.3); box-shadow: 0 0 15px rgba(57, 255, 20, 0.1); }
+        .neon-border:focus { border-color: rgba(57, 255, 20, 1); box-shadow: 0 0 20px rgba(57, 255, 20, 0.4); }
+        .glass-card { background: rgba(20, 19, 19, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
+        body { background-color: #0a0a0a; background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0a0a0a 100%); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6 text-white font-['Be_Vietnam_Pro']">
+    <div class="fixed inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-neon-green/10 blur-[120px] rounded-full"></div>
+    </div>
+
+    <div class="w-full max-w-md z-10">
+        <div class="text-center mb-10">
+            <a href="index.html" class="text-3xl font-black italic tracking-tighter uppercase mb-2 inline-block">GORÓ DA MANSÃO</a>
+            <p class="text-zinc-500 font-['Space_Grotesk'] uppercase tracking-[0.2em] text-xs">Acessar sua conta de Cria</p>
+        </div>
+
+        <div class="glass-card p-10 rounded-2xl shadow-2xl">
+            <h1 class="text-2xl font-bold font-['Space_Grotesk'] mb-8 text-center uppercase tracking-tight">FAZER LOGIN</h1>
+            
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2 ml-1">Seu E-mail</label>
+                    <input type="email" id="email" required class="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none transition-all neon-border" placeholder="nome@email.com">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2 ml-1">Senha Secreta</label>
+                    <input type="password" id="password" required class="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none transition-all neon-border" placeholder="••••••••">
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full py-5 bg-neon-green text-black font-black uppercase tracking-widest rounded-xl hover:shadow-[0_0_30px_rgba(57,255,20,0.3)] transition-all active:scale-[0.98]">
+                        ENTRAR NA MANSÃO
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-8 text-center">
+                <p class="text-zinc-500 text-sm italic">Não tem conta? <a href="cadastro.html" class="text-white underline hover:text-neon-green transition-colors">Cadastre-se aqui</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal -->
+    <div id="msg-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] hidden items-center justify-center p-6">
+        <div class="bg-surface-container border border-white/10 p-10 rounded-2xl max-w-sm w-full text-center shadow-2xl relative overflow-hidden bg-[#141313]">
+            <div id="modal-accent" class="absolute top-0 left-0 w-full h-1 bg-neon-green"></div>
+            <span id="modal-icon" class="material-symbols-outlined text-neon-green text-5xl mb-4">check_circle</span>
+            <h3 id="modal-title" class="font-headline-md text-xl uppercase mb-2">MESSAGEM</h3>
+            <p id="modal-msg" class="text-zinc-500 text-sm mb-8">Descrição da mensagem aqui.</p>
+            <button id="modal-btn" onclick="closeModal()" class="w-full py-4 bg-white text-black font-black uppercase tracking-widest hover:bg-zinc-200 transition-all">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <script>
+        let redirectUrl = null;
+
+        function showModal(title, message, isError = false, redirect = null) {
+            const modal = document.getElementById('msg-modal');
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-msg').textContent = message;
+            const icon = document.getElementById('modal-icon');
+            const accent = document.getElementById('modal-accent');
+            
+            redirectUrl = redirect;
+            
+            if (isError) {
+                icon.textContent = 'error';
+                icon.className = 'material-symbols-outlined text-red-500 text-5xl mb-4';
+                accent.className = 'absolute top-0 left-0 w-full h-1 bg-red-500';
+            } else {
+                icon.textContent = 'check_circle';
+                icon.className = 'material-symbols-outlined text-neon-green text-5xl mb-4';
+                accent.className = 'absolute top-0 left-0 w-full h-1 bg-neon-green';
+            }
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('msg-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            if (redirectUrl) window.location.href = redirectUrl;
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    localStorage.setItem('user', JSON.stringify(result.user));
+                    showModal('BEM VINDO!', 'Acesso autorizado. Aproveite a Mansão!', false, 'index.html');
+                } else {
+                    showModal('ACESSO NEGADO', result.error, true);
+                }
+            } catch (error) {
+                showModal('ERRO', 'Conexão falhou.', true);
+            }
+        });
+    </script>
+</body>
+</html>

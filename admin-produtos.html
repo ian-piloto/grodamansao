@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Be+Vietnam+Pro:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "neon-pink": "#FF007F",
+                        "neon-green": "#39FF14"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-card { background: rgba(20, 19, 19, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
+        .neon-glow { text-shadow: 0 0 15px rgba(255, 0, 127, 0.5); }
+    </style>
+</head>
+<body class="bg-[#0a0a0a] text-white font-['Be_Vietnam_Pro'] p-6 md:p-12 min-h-screen">
+    <div class="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,#1a1a1a_0%,#0a0a0a_100%)] pointer-events-none"></div>
+    <div class="max-w-6xl mx-auto relative z-10">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+            <div>
+                <h1 class="text-4xl font-black font-['Space_Grotesk'] italic tracking-tighter uppercase neon-glow">CATÁLOGO DE PRODUTOS</h1>
+                <p class="text-zinc-500 font-['Space_Grotesk'] uppercase tracking-[0.2em] text-xs">Gestão da Mansão • Administrativo</p>
+            </div>
+            <div class="flex gap-4">
+                <a href="admin-clientes.html" class="flex items-center gap-3 border border-white/20 px-6 py-4 font-bold uppercase tracking-widest hover:bg-white/5 transition-all text-sm">CLIENTES</a>
+                <button onclick="toggleModal('modal')" class="flex items-center gap-3 bg-neon-pink text-white px-8 py-4 font-bold uppercase tracking-widest hover:shadow-[0_0_20px_#FF007F] transition-all">
+                    <span class="material-symbols-outlined">add</span> NOVO GORÓ
+                </button>
+            </div>
+        </header>
+
+        <div id="admin-product-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Produtos administrativos aqui -->
+        </div>
+    </div>
+
+    <!-- Modal Novo Produto -->
+    <div id="modal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden items-center justify-center p-6 z-[100]">
+        <div class="glass-card w-full max-w-lg p-10 rounded-2xl relative">
+            <button onclick="toggleModal('modal')" class="absolute top-6 right-6 text-zinc-500 hover:text-white">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <h2 class="text-2xl font-bold font-['Space_Grotesk'] uppercase mb-8">Novo Produto</h2>
+            
+            <form id="product-form" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="name" required placeholder="NOME" class="bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-white">
+                    <input type="number" id="price" required placeholder="PREÇO" class="bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-white">
+                </div>
+                <input type="text" id="tag" required placeholder="TAG (ex: BEST SELLER)" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-white">
+                <textarea id="description" required placeholder="DESCRIÇÃO" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-white h-24"></textarea>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="glow_color" required placeholder="COR HEX (ex: #FF00FF)" class="bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-white">
+                    <input type="text" id="image_url" required placeholder="URL DA IMAGEM" class="bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-white">
+                </div>
+                <button type="submit" class="w-full py-5 bg-white text-black font-black uppercase tracking-widest rounded-xl hover:bg-zinc-200 transition-all">SALVAR NO ARQUIVO</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Message Modal -->
+    <div id="msg-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] hidden items-center justify-center p-6">
+        <div class="bg-surface-container border border-white/10 p-10 rounded-2xl max-w-sm w-full text-center shadow-2xl relative overflow-hidden bg-[#141313]">
+            <div id="modal-accent" class="absolute top-0 left-0 w-full h-1 bg-neon-pink"></div>
+            <span id="modal-icon" class="material-symbols-outlined text-neon-pink text-5xl mb-4">check_circle</span>
+            <h3 id="modal-title" class="font-headline-md text-xl uppercase mb-2">MESSAGEM</h3>
+            <p id="modal-msg" class="text-zinc-500 text-sm mb-8">Descrição da mensagem aqui.</p>
+            <button onclick="closeMsgModal()" class="w-full py-4 bg-white text-black font-black uppercase tracking-widest hover:bg-zinc-200 transition-all">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleModal(id) {
+            document.getElementById(id).classList.toggle('hidden');
+            document.getElementById(id).classList.toggle('flex');
+        }
+
+        function showMsgModal(title, message, isError = false) {
+            const modal = document.getElementById('msg-modal');
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-msg').textContent = message;
+            const icon = document.getElementById('modal-icon');
+            const accent = document.getElementById('modal-accent');
+            
+            if (isError) {
+                icon.textContent = 'error';
+                icon.className = 'material-symbols-outlined text-red-500 text-5xl mb-4';
+                accent.className = 'absolute top-0 left-0 w-full h-1 bg-red-500';
+            } else {
+                icon.textContent = 'check_circle';
+                icon.className = 'material-symbols-outlined text-neon-pink text-5xl mb-4';
+                accent.className = 'absolute top-0 left-0 w-full h-1 bg-neon-pink';
+            }
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeMsgModal() {
+            const modal = document.getElementById('msg-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        async function loadAdminProducts() {
+            const response = await fetch('/api/products');
+            const products = await response.json();
+            const grid = document.getElementById('admin-product-list');
+            grid.innerHTML = '';
+
+            products.forEach(product => {
+                grid.innerHTML += `
+                    <div class="glass-card p-6 rounded-2xl flex flex-col gap-4 group transition-all hover:border-white/20">
+                        <div class="aspect-square bg-black/40 rounded-xl overflow-hidden flex items-center justify-center p-8">
+                            <img src="${product.image_url}" class="w-full h-full object-contain filter group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-bold text-xl uppercase">${product.name}</h3>
+                                <p class="text-zinc-500 text-sm">R$ ${product.price}</p>
+                            </div>
+                            <span class="text-[10px] font-black bg-zinc-800 px-3 py-1 uppercase">${product.tag}</span>
+                        </div>
+                        <div class="flex gap-2 pt-4">
+                            <button onclick="confirmDelete(${product.id})" class="flex-1 py-3 border border-red-500/30 text-red-500 text-[10px] font-bold uppercase tracking-widest hover:bg-red-500/10 transition-all">DELETAR</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        document.getElementById('product-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('name').value,
+                price: parseFloat(document.getElementById('price').value),
+                description: document.getElementById('description').value,
+                tag: document.getElementById('tag').value,
+                glow_color: document.getElementById('glow_color').value,
+                image_url: document.getElementById('image_url').value
+            };
+
+            const response = await fetch('/api/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                showMsgModal('MARCHA!', 'Produto adicionado com sucesso ao inventário.');
+                toggleModal('modal');
+                loadAdminProducts();
+                document.getElementById('product-form').reset();
+            } else {
+                showMsgModal('ERRO', 'Não foi possível cadastrar o produto.', true);
+            }
+        });
+
+        async function confirmDelete(id) {
+            // Simplificando o confirm para usar o nativo por enquanto, mas o sucesso vai no modal
+            if (confirm('VISÃO: Tem certeza que quer remover esse goró?')) {
+                const response = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    showMsgModal('REMOVIDO', 'O produto foi excluído da Mansão.');
+                    loadAdminProducts();
+                } else {
+                    showMsgModal('ERRO', 'Erro ao deletar produto.', true);
+                }
+            }
+        }
+
+        window.onload = loadAdminProducts;
+    </script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-br">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Be+Vietnam+Pro:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "background": "#141313",
+              "neon-green": "#39FF14",
+              "neon-pink": "#FF007F",
+              "neon-red": "#ff3131"
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+        .marquee { white-space: nowrap; overflow: hidden; position: relative; width: 100%; display: flex; }
+        .marquee-content { display: flex; flex-shrink: 0; min-width: 100%; animation: scroll 60s linear infinite; gap: 4rem; padding-right: 4rem; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        
+        .glass-panel { backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.05); transition: all 0.5s ease; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-panel:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-5px); border-color: rgba(57, 255, 20, 0.3); }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        
+        .text-glow-green { text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
+    </style>
+</head>
+<body class="bg-background text-white font-['Be_Vietnam_Pro'] overflow-x-hidden">
+    <!-- TopAppBar -->
+    <header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 h-20 bg-black/90 backdrop-blur-xl border-b border-white/5 shadow-[0_0_20px_rgba(255,255,255,0.05)]">
+        <a href="index.html" class="text-2xl font-black italic tracking-tighter text-white font-['Space_Grotesk'] uppercase">GORÓ DA MANSÃO</a>
+        <nav class="hidden md:flex gap-8 items-center">
+            <a class="font-['Space_Grotesk'] uppercase tracking-widest font-bold text-zinc-500 hover:text-white transition-colors" href="catalogo.html">Shop</a>
+            <a class="font-['Space_Grotesk'] uppercase tracking-widest font-bold text-white border-b-2 border-white pb-1" href="porque.html">Why Goró?</a>
+            <a class="font-['Space_Grotesk'] uppercase tracking-widest font-bold text-zinc-500 hover:text-white transition-colors" href="lifestyle.html">Culture</a>
+        </nav>
+        <div class="flex items-center gap-6">
+            <a href="checkout.html" class="material-symbols-outlined text-white cursor-pointer relative">
+                shopping_cart
+                <span class="cart-count absolute -top-1 -right-1 bg-neon-pink text-white text-[10px] font-bold px-1 rounded-full">0</span>
+            </a>
+            <a href="login.html" id="user-btn" class="material-symbols-outlined text-white cursor-pointer">person</a>
+            <span id="user-name" class="hidden text-xs font-bold uppercase tracking-widest text-neon-green"></span>
+        </div>
+
+        <script>
+            function updateNavbar() {
+                const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+                document.querySelectorAll('.cart-count').forEach(el => el.textContent = count);
+
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user) {
+                    document.getElementById('user-name').textContent = user.name.split(' ')[0];
+                    document.getElementById('user-name').classList.remove('hidden');
+                    document.getElementById('user-btn').textContent = 'account_circle';
+                }
+            }
+            window.onload = updateNavbar;
+        </script>
+    </header>
+
+    <main class="pt-20">
+        <!-- Hero Section -->
+        <section class="relative min-h-[70vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-green/10 rounded-full blur-[120px] -z-10"></div>
+            <h1 class="font-['Space_Grotesk'] text-6xl md:text-8xl font-black uppercase mb-6 animate-fade-in">
+                O FUTURO DO <span class="text-neon-green text-glow-green">FLOW</span>
+            </h1>
+            <p class="text-zinc-400 max-w-2xl text-lg md:text-xl animate-fade-in" style="animation-delay: 0.2s">
+                A ciência por trás do lifestyle de quem não para. Entenda por que trocamos a taquicardia pela performance pura.
+            </p>
+        </section>
+
+        <!-- Marquee -->
+        <div class="w-full py-6 bg-white/5 border-y border-white/10 marquee">
+            <div class="marquee-content font-['Space_Grotesk'] text-neon-green font-bold uppercase tracking-widest text-xs items-center">
+                <span>MARCHA NO PROGRESSO</span> <span class="text-zinc-700">★</span>
+                <span>PERFORMANCE SEM STIMULANTS</span> <span class="text-zinc-700">★</span>
+                <span>VIBE DE CRIA</span> <span class="text-zinc-700">★</span>
+                <span>0% CAFFEINE</span> <span class="text-zinc-700">★</span>
+            </div>
+            <div class="marquee-content font-['Space_Grotesk'] text-neon-green font-bold uppercase tracking-widest text-xs items-center">
+                <span>MARCHA NO PROGRESSO</span> <span class="text-zinc-700">★</span>
+                <span>PERFORMANCE SEM STIMULANTS</span> <span class="text-zinc-700">★</span>
+                <span>VIBE DE CRIA</span> <span class="text-zinc-700">★</span>
+                <span>0% CAFFEINE</span> <span class="text-zinc-700">★</span>
+            </div>
+        </div>
+
+        <!-- Comparison Section -->
+        <section class="max-w-7xl mx-auto px-6 py-32 grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Danger -->
+            <div class="glass-panel p-10 rounded-3xl border-red-500/10 hover:border-red-500/30 group animate-fade-in" style="animation-delay: 0.4s">
+                <span class="text-red-500 font-bold uppercase tracking-widest text-xs mb-4 block">STATUS: PERIGO</span>
+                <h2 class="font-['Space_Grotesk'] text-4xl font-black uppercase mb-8 text-red-500">O PERIGO DO MIX</h2>
+                <div class="space-y-8">
+                    <div class="flex gap-4">
+                        <span class="material-symbols-outlined text-red-500">heart_broken</span>
+                        <div>
+                            <h4 class="font-bold uppercase text-white">Taquicardia</h4>
+                            <p class="text-zinc-500 text-sm">Cafeína sintética sobrecarregando o sistema.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <span class="material-symbols-outlined text-red-500">battery_charging_20</span>
+                        <div>
+                            <h4 class="font-bold uppercase text-white">The Crash</h4>
+                            <p class="text-zinc-500 text-sm">Queda livre de energia após o efeito passar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goró -->
+            <div class="glass-panel p-10 rounded-3xl border-neon-green/20 hover:border-neon-green/50 animate-fade-in" style="animation-delay: 0.6s">
+                <span class="text-neon-green font-bold uppercase tracking-widest text-xs mb-4 block">STATUS: PERFORMANCE</span>
+                <h2 class="font-['Space_Grotesk'] text-4xl font-black uppercase mb-8 text-neon-green">A VISÃO DE CRIA</h2>
+                <div class="space-y-8">
+                    <div class="flex gap-4">
+                        <span class="material-symbols-outlined text-neon-green">verified</span>
+                        <div>
+                            <h4 class="font-bold uppercase text-white">0% Estimulantes</h4>
+                            <p class="text-zinc-500 text-sm">Foco limpo e natural sem química pesada.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <span class="material-symbols-outlined text-neon-green">water_drop</span>
+                        <div>
+                            <h4 class="font-bold uppercase text-white">Hidratação</h4>
+                            <p class="text-zinc-500 text-sm">Fórmula isotônica que repõe enquanto você curte.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="py-40 text-center px-6 animate-fade-in" style="animation-delay: 0.8s">
+            <h2 class="font-['Space_Grotesk'] text-5xl md:text-7xl font-black uppercase mb-12">FAÇA A ESCOLHA<br/>INTELIGENTE.</h2>
+            <a href="catalogo.html" class="inline-block px-16 py-6 bg-white text-black font-black uppercase tracking-widest hover:bg-neon-green transition-all hover:scale-110 shadow-2xl">
+                COMPRAR AGORA
+            </a>
+        </section>
+    </main>
+
+    <footer class="w-full py-20 px-10 flex flex-col items-center text-center bg-black border-t border-white/5">
+        <div class="text-4xl font-black text-white opacity-20 mb-8 font-['Space_Grotesk']">GORÓ DA MANSÃO</div>
+        <p class="text-zinc-600 text-xs font-bold uppercase">© 2024 GORÓ DA MANSÃO. MARCHA NO PROGRESSO.</p>
+    </footer>
+</body>
+</html>

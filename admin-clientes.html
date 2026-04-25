@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Be+Vietnam+Pro:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "neon-pink": "#FF007F",
+                        "neon-green": "#39FF14"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-card { background: rgba(20, 19, 19, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
+        .neon-glow { text-shadow: 0 0 15px rgba(57, 255, 20, 0.5); }
+    </style>
+</head>
+<body class="bg-[#0a0a0a] text-white font-['Be_Vietnam_Pro'] p-6 md:p-12 min-h-screen">
+    <div class="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,#1a1a1a_0%,#0a0a0a_100%)] pointer-events-none"></div>
+    <div class="max-w-6xl mx-auto relative z-10">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+            <div>
+                <h1 class="text-4xl font-black font-['Space_Grotesk'] italic tracking-tighter uppercase neon-glow text-neon-green">LISTA DE CLIENTES</h1>
+                <p class="text-zinc-500 font-['Space_Grotesk'] uppercase tracking-[0.2em] text-xs">Gestão da Mansão • Base de Dados</p>
+            </div>
+            <a href="admin-produtos.html" class="flex items-center gap-3 border border-white/20 px-8 py-4 font-bold uppercase tracking-widest hover:bg-white/5 transition-all">
+                IR PARA PRODUTOS
+            </a>
+        </header>
+
+        <div class="glass-card rounded-2xl overflow-hidden shadow-2xl">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-white/5 border-b border-white/10">
+                        <th class="p-6 font-['Space_Grotesk'] uppercase text-xs tracking-widest text-zinc-400">ID</th>
+                        <th class="p-6 font-['Space_Grotesk'] uppercase text-xs tracking-widest text-zinc-400">Nome de Cria</th>
+                        <th class="p-6 font-['Space_Grotesk'] uppercase text-xs tracking-widest text-zinc-400">E-mail Digital</th>
+                        <th class="p-6 font-['Space_Grotesk'] uppercase text-xs tracking-widest text-zinc-400">WhatsApp</th>
+                        <th class="p-6 font-['Space_Grotesk'] uppercase text-xs tracking-widest text-zinc-400">Membro Desde</th>
+                    </tr>
+                </thead>
+                <tbody id="user-list">
+                    <!-- Usuários aqui -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function loadUsers() {
+            const response = await fetch('/api/users');
+            const users = await response.json();
+            const tbody = document.getElementById('user-list');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                tbody.innerHTML += `
+                    <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                        <td class="p-6 text-zinc-500 text-sm font-mono">#${user.id}</td>
+                        <td class="p-6 font-bold uppercase tracking-tight">${user.name}</td>
+                        <td class="p-6 text-zinc-400">${user.email}</td>
+                        <td class="p-6 text-neon-green font-mono text-sm">${user.phone || 'N/A'}</td>
+                        <td class="p-6 text-zinc-500 text-xs">${new Date(user.created_at).toLocaleDateString('pt-BR')}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.onload = loadUsers;
+    </script>
+</body>
+</html>

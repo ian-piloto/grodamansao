@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&amp;family=Be+Vietnam+Pro:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#cac6c3",
+                    "primary-fixed": "#e5e2e1",
+                    "surface-container-high": "#2b2a2a",
+                    "on-primary-fixed-variant": "#474646",
+                    "background": "#141313",
+                    "on-primary-fixed": "#1c1b1b",
+                    "on-error": "#690005",
+                    "primary-container": "#0d0d0d",
+                    "secondary-fixed": "#e5e2e1",
+                    "inverse-on-surface": "#313030",
+                    "inverse-surface": "#e5e2e1",
+                    "on-secondary-fixed": "#1c1b1b",
+                    "surface-container": "#201f1f",
+                    "on-surface": "#e5e2e1",
+                    "error": "#ffb4ab",
+                    "on-secondary-container": "#b7b5b4",
+                    "tertiary-container": "#0e0d0c",
+                    "surface-dim": "#141313",
+                    "secondary-fixed-dim": "#c8c6c5",
+                    "outline": "#8e9192",
+                    "on-surface-variant": "#c4c7c7",
+                    "on-secondary-fixed-variant": "#474746",
+                    "on-error-container": "#ffdad6",
+                    "surface-tint": "#c9c6c5",
+                    "inverse-primary": "#5f5e5e",
+                    "on-background": "#e5e2e1",
+                    "on-tertiary": "#32302f",
+                    "surface-variant": "#353434",
+                    "secondary": "#c8c6c5",
+                    "on-primary": "#313030",
+                    "on-secondary": "#313030",
+                    "outline-variant": "#444748",
+                    "primary": "#c9c6c5",
+                    "error-container": "#93000a",
+                    "surface-container-low": "#1c1b1b",
+                    "surface-container-highest": "#353434",
+                    "on-tertiary-fixed-variant": "#484645",
+                    "surface-container-lowest": "#0e0e0e",
+                    "secondary-container": "#474746",
+                    "surface-bright": "#3a3939",
+                    "on-tertiary-container": "#7d7a78",
+                    "surface": "#141313",
+                    "tertiary": "#cac6c3",
+                    "on-primary-container": "#7c7a7a",
+                    "on-tertiary-fixed": "#1d1b1a",
+                    "primary-fixed-dim": "#c9c6c5",
+                    "tertiary-fixed": "#e6e1df",
+                    "neon-pink": "#FF007F",
+                    "neon-green": "#39FF14"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "body-md": ["Be Vietnam Pro"],
+                    "headline-lg": ["Space Grotesk"],
+                    "headline-md": ["Space Grotesk"],
+                    "body-lg": ["Be Vietnam Pro"],
+                    "label-caps": ["Space Grotesk"],
+                    "display-xl": ["Space Grotesk"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["48px", {"lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["32px", {"lineHeight": "38px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-caps": ["14px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "display-xl": ["120px", {"lineHeight": "110px", "letterSpacing": "-0.04em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glow-pink { box-shadow: 0 0 25px rgba(255, 0, 127, 0.4); }
+        .text-glow-pink { text-shadow: 0 0 10px rgba(255, 0, 127, 0.8); }
+        .text-glow-green { text-shadow: 0 0 10px rgba(57, 255, 20, 0.8); }
+        .marquee { white-space: nowrap; overflow: hidden; position: relative; width: 100%; display: flex; }
+        .marquee-content { display: flex; flex-shrink: 0; min-width: 100%; animation: scroll 60s linear infinite; gap: 4rem; padding-right: 4rem; }
+        @keyframes scroll { 
+            0% { transform: translateX(0); } 
+            100% { transform: translateX(-100%); } 
+        }
+        .marquee:hover .marquee-content { animation-play-state: paused; }
+        .glass-panel { backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.05); transition: all 0.5s ease; }
+        .glass-panel:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-5px); border-color: rgba(255, 0, 127, 0.3); }
+        
+        /* Modal Animations */
+        @keyframes modalShow {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-modal { animation: modalShow 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(var(--rot)); }
+            50% { transform: translateY(-10px) rotate(var(--rot)); }
+        }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 h-20 bg-black/90 backdrop-blur-xl border-b border-white/5 shadow-[0_0_20px_rgba(255,255,255,0.05)]">
+<div class="text-2xl font-black italic tracking-tighter text-white">GORÓ DA MANSÃO</div>
+<nav class="hidden md:flex gap-8 items-center">
+<a class="font-['Space_Grotesk'] uppercase tracking-widest font-bold text-white border-b-2 border-white pb-1" href="index.html">Shop</a>
+<a class="font-['Space_Grotesk'] uppercase tracking-widest font-bold text-zinc-500 hover:text-white transition-colors" href="porque.html">Why Goró?</a>
+<a class="font-['Space_Grotesk'] uppercase tracking-widest font-bold text-zinc-500 hover:text-white transition-colors" href="lifestyle.html">Culture</a>
+</nav>
+<div class="flex items-center gap-6">
+<a href="checkout.html" class="material-symbols-outlined text-white cursor-pointer hover:bg-white/5 p-2 rounded-full transition-all relative">
+    shopping_cart
+    <span class="cart-count absolute -top-1 -right-1 bg-neon-pink text-white text-[10px] font-bold px-1 rounded-full">0</span>
+</a>
+<a href="login.html" id="user-btn" class="material-symbols-outlined text-white cursor-pointer hover:bg-white/5 p-2 rounded-full transition-all">person</a>
+<span id="user-name" class="hidden text-xs font-bold uppercase tracking-widest text-neon-green"></span>
+</div>
+
+<script>
+    function updateNavbar() {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.querySelectorAll('.cart-count').forEach(el => el.textContent = count);
+
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user) {
+            document.getElementById('user-name').textContent = user.name.split(' ')[0];
+            document.getElementById('user-name').classList.remove('hidden');
+            document.getElementById('user-btn').textContent = 'account_circle';
+        }
+    }
+
+    function showModal(title, message, isError = false) {
+        const modal = document.getElementById('msg-modal');
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-msg').textContent = message;
+        const icon = document.getElementById('modal-icon');
+        icon.textContent = isError ? 'error' : 'check_circle';
+        icon.className = `material-symbols-outlined text-4xl \${isError ? 'text-red-500' : 'text-neon-pink'}`;
+        
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('msg-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+    window.onload = updateNavbar;
+</script>
+</header>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-24 overflow-hidden">
+<!-- Background Aura -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-pink/20 rounded-full blur-[120px] -z-10"></div>
+<div class="flex-1 z-10 max-w-2xl text-center md:text-left">
+<div class="inline-block px-4 py-1 border border-neon-pink text-neon-pink font-label-caps text-xs mb-6 rounded-full uppercase tracking-widest">Original Flavor 2026</div>
+<h1 class="font-display-xl text-display-xl uppercase mb-6 leading-[0.9] break-words">O SABOR DA <span class="text-neon-pink text-glow-pink">FESTA</span>. O FOCO NO <span class="italic">PROGRESSO</span>.</h1>
+<p class="font-body-lg text-body-lg text-zinc-400 mb-10 max-w-lg">Sabor energético original, 0% Estimulantes, 100% vibe. Em pleno 2026, você ainda mistura o que te faz mal?</p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+<a href="catalogo.html" class="px-10 py-5 bg-white text-black font-label-caps uppercase hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all transform active:scale-95 text-center">Garanta o Seu</a>
+<a href="catalogo.html" class="px-10 py-5 border border-white/20 hover:bg-white/5 font-label-caps uppercase transition-all text-center">Explorar Sabores</a>
+</div>
+</div>
+<div class="flex-1 relative mt-20 md:mt-0 flex justify-center">
+<!-- Floating Labels (Sticker Effect) -->
+<div class="absolute -top-10 right-0 md:right-20 bg-neon-green text-black px-4 py-2 font-black z-20 text-sm animate-float" style="--rot: 12deg;">NO CAFFEINE</div>
+<div class="absolute bottom-20 left-0 bg-white text-black px-4 py-2 font-black z-20 text-sm animate-float" style="--rot: -6deg;">HIGH PERFORMANCE</div>
+<img alt="Goró Bottle Pink" class="w-full max-w-[500px] object-contain filter drop-shadow-[0_0_50px_rgba(255,0,127,0.3)]" data-alt="Premium sleek soda can in neon pink lighting, isolated on black background, professional product photography, futuristic aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqbuGbmBNIUG2GNxg7nYmzNv3qifIevVTAG_-Be2b-t3wak5-bv6QPv-R_3ZXUr-uZb9ILQwZ2SvynstZFVmd-Xh6l0sv7pvug8llmJK9U68-0HhdxgSj5sWQ0DUGVD4eZY-pObStyRZzwruvoOs3heOvYaYW1qSRSfY4mBGTapmCbhEYmd3c9YtjYCle1Bly0-2kJBk1jAhZ8jxz3557DTHrzG4oIzISUoqXpifQCNoiwOWHxpnkyKnx0UhE1ebs5HjYXb7joAA"/>
+</div>
+</section>
+<div class="w-full bg-white text-black py-4 marquee overflow-hidden border-y border-white/10 uppercase">
+    <div class="marquee-content font-display-xl text-3xl font-black tracking-tighter">
+        <span>MARCHA NO PROGRESSO • VISÃO DE CRIA • SUCO DO ENTRETENIMENTO • 0% CAFEÍNA • MARCHA NO PROGRESSO • VISÃO DE CRIA</span>
+    </div>
+    <div class="marquee-content font-display-xl text-3xl font-black tracking-tighter">
+        <span>MARCHA NO PROGRESSO • VISÃO DE CRIA • SUCO DO ENTRETENIMENTO • 0% CAFEÍNA • MARCHA NO PROGRESSO • VISÃO DE CRIA</span>
+    </div>
+</div>
+<!-- FLOW Section -->
+<section class="py-32 bg-black overflow-hidden">
+    <div class="max-w-4xl mx-auto px-6 text-center mb-16">
+        <h2 class="font-display-xl text-9xl md:text-[180px] uppercase italic tracking-tighter opacity-10 mb-[-60px] md:mb-[-100px]">FLOW</h2>
+        <p class="text-zinc-500 font-['Space_Grotesk'] text-sm md:text-base leading-relaxed max-w-2xl mx-auto relative z-10">
+            A ciência por trás do lifestyle de quem não para. Entenda por que trocamos a taquicardia pela performance pura.
+        </p>
+    </div>
+    
+    <div class="w-full bg-zinc-900/50 py-6 marquee border-y border-white/5">
+        <div class="marquee-content font-['Space_Grotesk'] text-neon-green font-bold uppercase tracking-widest text-xs items-center">
+            <span>MARCHA NO PROGRESSO</span> <span class="text-zinc-700">★</span>
+            <span>PERFORMANCE SEM STIMULANTS</span> <span class="text-zinc-700">★</span>
+            <span>VIBE DE CRIA</span> <span class="text-zinc-700">★</span>
+            <span>0% CAFFEINE</span> <span class="text-zinc-700">★</span>
+        </div>
+        <div class="marquee-content font-['Space_Grotesk'] text-neon-green font-bold uppercase tracking-widest text-xs items-center">
+            <span>MARCHA NO PROGRESSO</span> <span class="text-zinc-700">★</span>
+            <span>PERFORMANCE SEM STIMULANTS</span> <span class="text-zinc-700">★</span>
+            <span>VIBE DE CRIA</span> <span class="text-zinc-700">★</span>
+            <span>0% CAFFEINE</span> <span class="text-zinc-700">★</span>
+        </div>
+    </div>
+</section>
+
+<!-- Features Bento Grid -->
+<section class="py-32 px-6 max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Large Feature -->
+<div class="md:col-span-8 glass-panel p-10 border border-white/5 flex flex-col justify-between min-h-[500px] overflow-hidden group">
+<div>
+<span class="text-neon-green font-label-caps mb-4 block">VS. TRADITIONAL ENERGIES</span>
+<h2 class="font-headline-lg text-headline-lg uppercase mb-6 max-w-md">ENERGIA REAL NÃO VEM DE <span class="text-zinc-600 line-through">QUÍMICA</span>.</h2>
+<p class="text-zinc-400 max-w-sm">Eliminamos a taquicardia e o crash. Focamos no sabor e na presença. Goró da Mansão é o combustível da nova era.</p>
+</div>
+<div class="relative h-48 mt-10">
+<img alt="Neon Liquids" class="absolute right-0 bottom-0 w-64 h-64 object-cover rounded-full filter saturate-150 grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="Vibrant neon green liquid splashing in a glass, dark environment, high-speed photography, electric energy aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFDrGVIBxk8TRIdI_jfEUsNLrbk43C-s06z2TcsGjHJQgM0v6EVjbvaExLb6yEKbLAmpayfRXMlMYCpmTQiTto5mSx3lnTrG7V_mQcGBHS6Fv0huxtRGc3PVJ_btb-7innsX15O0EEL2K6YybC1EAFXlFNhCLKz8gftLHCQDRuLOYH0clxWP6O4dOQWrhetRrT1fqpbmBYdMLRQL1P1bNPaqzwTk7M4Mh7vOHhlFS5QMRpvlwORo689aGNUljfFrwJAIW5Q7tFyA"/>
+</div>
+</div>
+<!-- Small Features -->
+<div class="md:col-span-4 flex flex-col gap-6">
+<div class="glass-panel p-8 border border-white/5 flex-1">
+<span class="material-symbols-outlined text-neon-pink text-4xl mb-4">bolt</span>
+<h3 class="font-headline-md text-2xl uppercase mb-2">0% Estimulantes</h3>
+<p class="text-zinc-400 text-sm">Foco puro. Sem tremedeira, sem ansiedade. Apenas a vibe do entretenimento.</p>
+</div>
+<div class="glass-panel p-8 border border-neon-green/20 bg-neon-green/5 flex-1">
+<span class="material-symbols-outlined text-neon-green text-4xl mb-4">health_and_safety</span>
+<h3 class="font-headline-md text-2xl uppercase mb-2">Health First</h3>
+<p class="text-zinc-400 text-sm">Desenvolvido para quem treina pesado e vive no limite, sem comprometer a saúde.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Social Proof / Lifestyle Grid -->
+<section class="py-32 bg-zinc-950">
+<div class="px-6 text-center mb-16">
+<h2 class="font-display-xl text-5xl md:text-7xl uppercase mb-4">MANSÃO MAROMBA <span class="text-white/20">APPROVED</span></h2>
+<p class="font-label-caps text-zinc-500 tracking-[0.3em]">A CULTURA DO PROGRESSO ESTÁ AQUI</p>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-2 px-2">
+<div class="aspect-square relative overflow-hidden group">
+<img alt="Lifestyle 1" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="img/gym.png">
+<div class="absolute inset-0 bg-neon-pink/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="font-black text-white uppercase tracking-tighter">GYM FLOW</span>
+</div>
+</div>
+<div class="aspect-square relative overflow-hidden group">
+<img alt="Lifestyle 2" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="img/party.png">
+<div class="absolute inset-0 bg-neon-green/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="font-black text-white uppercase tracking-tighter">NIGHT VIBE</span>
+</div>
+</div>
+<div class="aspect-square relative overflow-hidden group">
+<img alt="Lifestyle 3" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="img/focus.png">
+<div class="absolute inset-0 bg-blue-500/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="font-black text-white uppercase tracking-tighter">TOTAL FOCUS</span>
+</div>
+</div>
+<div class="aspect-square relative overflow-hidden group">
+<img alt="Lifestyle 4" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="img/street.png">
+<div class="absolute inset-0 bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="font-black text-white uppercase tracking-tighter">STREET STYLE</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA Section: Escolha Inteligente -->
+<section class="py-40 bg-zinc-950 flex items-center justify-center">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+        <h2 class="font-display-xl text-5xl md:text-7xl uppercase mb-6 tracking-tighter">FAÇA A ESCOLHA INTELIGENTE.</h2>
+        <p class="text-zinc-500 font-['Be_Vietnam_Pro'] text-sm md:text-base leading-relaxed max-w-xl mx-auto mb-12">
+            Não deixe seu coração pagar o preço pela sua vibe. Marcha no progresso com o Goró da Mansão.
+        </p>
+        <a href="catalogo.html" class="inline-block px-12 py-5 bg-white text-black font-black uppercase tracking-widest hover:bg-zinc-200 transition-all hover:scale-105 active:scale-95 shadow-[0_20px_50px_rgba(255,255,255,0.1)]">
+            MARCHA NO PROGRESSO
+        </a>
+    </div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-20 px-10 flex flex-col items-center text-center bg-black border-t border-white/5">
+<div class="text-4xl font-black text-white opacity-20 mb-8 tracking-widest">GORÓ DA MANSÃO</div>
+<div class="flex flex-wrap justify-center gap-10 mb-12">
+<a class="font-['Space_Grotesk'] text-xs font-light tracking-wider text-zinc-600 hover:text-white transition-all" href="#">Terms of Service</a>
+<a class="font-['Space_Grotesk'] text-xs font-light tracking-wider text-zinc-600 hover:text-white transition-all" href="#">Privacy Policy</a>
+<a class="font-['Space_Grotesk'] text-xs font-light tracking-wider text-zinc-600 hover:text-white transition-all" href="#">Shipping Info</a>
+<a class="font-['Space_Grotesk'] text-xs font-light tracking-wider text-zinc-600 hover:text-white transition-all" href="#">Wholesale</a>
+</div>
+<p class="font-['Space_Grotesk'] text-xs font-light tracking-wider text-white">© 2024 GORÓ DA MANSÃO. 0% CAFFEINE. 100% VIBE.</p>
+</footer>
+<!-- BottomNavBar (Mobile Only) -->
+<div class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 pb-safe px-4 bg-black/95 backdrop-blur-2xl border-t border-white/10 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+<a href="index.html" class="flex flex-col items-center justify-center text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] scale-110">
+<span class="material-symbols-outlined">home</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold uppercase tracking-tight">Home</span>
+</a>
+<a href="catalogo.html" class="flex flex-col items-center justify-center text-zinc-600 hover:text-zinc-300 transition-all active:scale-90">
+<span class="material-symbols-outlined">liquor</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold uppercase tracking-tight">Gorós</span>
+</a>
+<a href="checkout.html" class="flex flex-col items-center justify-center text-zinc-600 hover:text-zinc-300 transition-all active:scale-90">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold uppercase tracking-tight">Cart</span>
+</a>
+<a href="lifestyle.html" class="flex flex-col items-center justify-center text-zinc-600 hover:text-zinc-300 transition-all active:scale-90">
+<span class="material-symbols-outlined">bolt</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold uppercase tracking-tight">Vibe</span>
+</a>
+</div>
+</body></html>

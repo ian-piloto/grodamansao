@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Be+Vietnam+Pro:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container": "#201f1f",
+                        "neon-pink": "#FF007F",
+                        "neon-green": "#39FF14"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel { backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.05); transition: all 0.3s ease; }
+        .glass-panel:hover { transform: translateY(-5px); border-color: rgba(255, 0, 127, 0.3); }
+        .neon-glow { text-shadow: 0 0 15px rgba(255, 0, 127, 0.5); }
+        
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-modal { animation: modalIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-black text-white font-['Be_Vietnam_Pro'] min-h-screen">
+    <header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 h-20 bg-black/90 backdrop-blur-xl border-b border-white/5">
+        <a href="index.html" class="text-2xl font-black italic tracking-tighter text-white">GORÓ DA MANSÃO</a>
+        <div class="flex items-center gap-6">
+            <a href="checkout.html" class="p-2 hover:bg-white/5 rounded-full relative">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span class="cart-count absolute -top-1 -right-1 bg-neon-pink text-white text-[10px] font-bold px-1 rounded-full">0</span>
+            </a>
+            <a href="login.html" id="user-btn" class="p-2 hover:bg-white/5 rounded-full">
+                <span class="material-symbols-outlined">person</span>
+            </a>
+            <span id="user-name" class="hidden text-xs font-bold uppercase tracking-widest text-zinc-500"></span>
+        </div>
+    </header>
+
+    <main class="pt-32 pb-20 px-6 max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h1 class="text-6xl font-black font-['Space_Grotesk'] uppercase italic tracking-tighter mb-4">O ARSENAL DO <span class="text-neon-pink neon-glow">ENTRETENIMENTO</span></h1>
+            <p class="text-zinc-500 font-['Space_Grotesk'] uppercase tracking-[0.4em] text-xs">Escolha sua dose de marcha no progresso</p>
+        </div>
+
+        <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Produtos serão carregados aqui -->
+        </div>
+    </main>
+
+    <!-- Modal Customizado -->
+    <div id="msg-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] hidden items-center justify-center p-6">
+        <div class="bg-[#141313] border border-white/10 p-10 rounded-2xl max-w-sm w-full text-center shadow-2xl relative overflow-hidden animate-modal">
+            <div id="modal-accent" class="absolute top-0 left-0 w-full h-1 bg-neon-pink"></div>
+            <span id="modal-icon" class="material-symbols-outlined text-neon-pink text-5xl mb-4">check_circle</span>
+            <h3 id="modal-title" class="font-bold text-xl uppercase mb-2">MESSAGEM</h3>
+            <p id="modal-msg" class="text-zinc-500 text-sm mb-8">Descrição aqui.</p>
+            <button onclick="closeModal()" class="w-full py-4 bg-white text-black font-black uppercase tracking-widest hover:bg-zinc-200 transition-all">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <script>
+        async function loadProducts() {
+            const response = await fetch('/api/products');
+            const products = await response.json();
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+
+            products.forEach(product => {
+                grid.innerHTML += `
+                    <div class="glass-panel p-8 rounded-2xl border border-white/5 flex flex-col group transition-all hover:border-white/20">
+                        <div class="aspect-square mb-8 relative flex items-center justify-center p-10">
+                            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <img src="${product.image_url}" class="w-full h-full object-contain filter group-hover:scale-105 transition-transform duration-700" style="filter: drop-shadow(0 0 30px ${product.glow_color}44)">
+                        </div>
+                        <div class="mt-auto">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="font-black text-2xl uppercase font-['Space_Grotesk']">${product.name}</h3>
+                                <span class="bg-zinc-800 text-[10px] font-black px-2 py-1 uppercase tracking-tighter">${product.tag}</span>
+                            </div>
+                            <p class="text-zinc-500 text-sm mb-8 line-clamp-3">${product.description}</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-3xl font-black">R$ ${product.price.toFixed(2)}</span>
+                                <button onclick='addToCart(${JSON.stringify(product)})' class="bg-white text-black px-6 py-3 font-black text-xs uppercase hover:bg-neon-pink hover:text-white transition-all transform active:scale-95">ADICIONAR</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            updateCartCount();
+        }
+
+        function addToCart(product) {
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const existing = cart.find(item => item.id === product.id);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            showModal('MARCHA NO PROGRESSO', `${product.name} foi adicionado ao seu carrinho.`);
+        }
+
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.querySelectorAll('.cart-count').forEach(el => el.textContent = count);
+
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                document.getElementById('user-name').textContent = user.name.split(' ')[0];
+                document.getElementById('user-name').classList.remove('hidden');
+                document.getElementById('user-btn').querySelector('span').textContent = 'account_circle';
+            }
+        }
+
+        function showModal(title, message, isError = false) {
+            const modal = document.getElementById('msg-modal');
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-msg').textContent = message;
+            const icon = document.getElementById('modal-icon');
+            
+            if (isError) {
+                icon.textContent = 'error';
+                icon.className = 'material-symbols-outlined text-red-500 text-5xl mb-4';
+            } else {
+                icon.textContent = 'check_circle';
+                icon.className = 'material-symbols-outlined text-neon-pink text-5xl mb-4';
+            }
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('msg-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        window.onload = loadProducts;
+    </script>
+</body>
+</html>
