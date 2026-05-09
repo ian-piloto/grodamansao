@@ -69,38 +69,92 @@
         </div>
     </div>
 
-    <script>
-        async function loadProducts() {
-            const response = await fetch('/api/products');
-            const products = await response.json();
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = '';
+    <script type="module">
+        import { db } from './firebase-config.js';
+        import { collection, getDocs, addDoc, query, limit } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-            products.forEach(product => {
-                grid.innerHTML += `
-                    <div class="glass-panel p-8 rounded-2xl border border-white/5 flex flex-col group transition-all hover:border-white/20">
-                        <div class="aspect-square mb-8 relative flex items-center justify-center p-10">
-                            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <img src="${product.image_url}" class="w-full h-full object-contain filter group-hover:scale-105 transition-transform duration-700" style="filter: drop-shadow(0 0 30px ${product.glow_color}44)">
-                        </div>
-                        <div class="mt-auto">
-                            <div class="flex justify-between items-start mb-4">
-                                <h3 class="font-black text-2xl uppercase font-['Space_Grotesk']">${product.name}</h3>
-                                <span class="bg-zinc-800 text-[10px] font-black px-2 py-1 uppercase tracking-tighter">${product.tag}</span>
+        const DEFAULT_PRODUCTS = [
+            {
+                name: "TRADITIONAL WATERMELON", 
+                price: 49.00, 
+                description: "Redução de danos com o frescor absoluto da melancia. Ideal para o sunrise after party.", 
+                tag: "BEST SELLER", 
+                glow_color: "#ff2e7e",
+                image_url: "https://lh3.googleusercontent.com/aida-public/AB6AXuB9ejDNPIiit_dtSNJjjb-zBFV-06Qqi-4wGFs_QxGv2IxotUEmFiHji22mQqf4nbVGpOjEYo6t79uScsoxMU4ZcubZJI0o6snV5otQ0a6YQAXOwBQUZcdOpMvtIZ3rAiXYxj7uhKpJLKcvTlBTn7k-OjTyVdqMaiYb3CpLbF04lv2Wr4Lz-uXLLrvTgtey64FP9MqRrCOKiuesSaIjoMWdFxi0Lm7m_08ZIjA09kIeol1h7N4jthaxMAHCX8RI2rCC-zNZbp_GEg"
+            },
+            {
+                name: "TROPICAL FRUITS", 
+                price: 55.00, 
+                description: "Blend exótico de mangas e maracujá. Investindo no projeto de uma noite imparável.", 
+                tag: "LIMITED", 
+                glow_color: "#ff8c00",
+                image_url: "https://lh3.googleusercontent.com/aida-public/AB6AXuBCRR7BUHKP_Z71y9q9MFMUIeZWyZTZf-uO81TwNtm-X0r0E79Zg3wxsWdV8SXVVyhkQmx-VXpk98FG00OtNXajLOlKbZhcXwpKNru7PQfv_QzrONvFXPUbIUaVzWo9WJfoqnecEol2eHXiY2d3KcHFhq-YXiv9uVjLfRYH6dpzkC-d9SzxjihhU9UZSqnxaoJk226K1ShP8YrzZdqxbpV-GUCI2MbgbARVDg9BvN2Nv26zM3BwZWPyGyUl9uCLhMkSLzYLeHEOaQ"
+            },
+            {
+                name: "GREEN APPLE ICE", 
+                price: 52.00, 
+                description: "A maçã verde elevada ao extremo gelo. Foco total para quem não dorme cedo.", 
+                tag: "ICE COLD", 
+                glow_color: "#32ff7e",
+                image_url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCW6HqcLlk4ROP2WWXSZMfYrQmfhUfTgzjNhxcvOPdlHusW7R9g1Q5NT4icYraRKAOHkreFTZFe-g1iJCgoKgIW6tlRJZ4YJOOnafdCLIcO7AVcM96sE1pNpWCdyCVAQUT1l6zX4XhgFa5szVMsclc2On83-KXsOZbjWsi8M01eq8IDrImyCdzh6uag51EZ1C-8YDp05EXrdWOnV3NpjrtVuDOX5hL2rhSTetFsWyuZmzJEM9uHh51pktc7-uWc9wLfd6h1zCEaJw"
+            },
+            {
+                name: "GRAPE & BERRY", 
+                price: 58.00, 
+                description: "Antocianinas naturais para uma performance cerebral prolongada. O sabor da elite.", 
+                tag: "SIGNATURE", 
+                glow_color: "#8a2be2",
+                image_url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCQmm1qDmQ-3f9pU-bmYYR98VB8_dIGQkh6QTo9EtIpi0dLq01G9spmfeK2wadRN82U1z6doowcH48YUcbz-bBa0qdVbSSkB3Su6TmCtBVijWu0f0fBOE9cWSLnXjM13t0XKab5GJIK62d0XGbbrxV1j99cz3910P8UpDIKBa5LpbWieiexUgaVcQ-JkGFj8KBlcFe0i6aLsGUfYL2u2a3_zgtx2J2aPY2-ZzbyPiPqvRy-bBuc6PE1ubU6ULAsub_3xgrZs7BYtA"
+            }
+        ];
+
+        async function loadProducts() {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '<div class="col-span-full text-center py-20 text-zinc-500 uppercase tracking-widest animate-pulse">Carregando Arsenal...</div>';
+            
+            try {
+                let querySnapshot = await getDocs(collection(db, "products"));
+                
+                // Se o banco estiver vazio, popular com os produtos padrão
+                if (querySnapshot.empty) {
+                    console.log("Banco vazio. Populando...");
+                    for (const p of DEFAULT_PRODUCTS) {
+                        await addDoc(collection(db, "products"), p);
+                    }
+                    querySnapshot = await getDocs(collection(db, "products"));
+                }
+
+                grid.innerHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const product = { id: doc.id, ...doc.data() };
+                    grid.innerHTML += `
+                        <div class="glass-panel p-8 rounded-2xl border border-white/5 flex flex-col group transition-all hover:border-white/20">
+                            <div class="aspect-square mb-8 relative flex items-center justify-center p-10">
+                                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <img src="${product.image_url}" class="w-full h-full object-contain filter group-hover:scale-105 transition-transform duration-700" style="filter: drop-shadow(0 0 30px ${product.glow_color}44)">
                             </div>
-                            <p class="text-zinc-500 text-sm mb-8 line-clamp-3">${product.description}</p>
-                            <div class="flex items-center justify-between">
-                                <span class="text-3xl font-black">R$ ${product.price.toFixed(2)}</span>
-                                <button onclick='addToCart(${JSON.stringify(product)})' class="bg-white text-black px-6 py-3 font-black text-xs uppercase hover:bg-neon-pink hover:text-white transition-all transform active:scale-95">ADICIONAR</button>
+                            <div class="mt-auto">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h3 class="font-black text-2xl uppercase font-['Space_Grotesk']">${product.name}</h3>
+                                    <span class="bg-zinc-800 text-[10px] font-black px-2 py-1 uppercase tracking-tighter">${product.tag}</span>
+                                </div>
+                                <p class="text-zinc-500 text-sm mb-8 line-clamp-3">${product.description}</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-3xl font-black">R$ ${product.price.toFixed(2)}</span>
+                                    <button onclick='addToCart(${JSON.stringify(product)})' class="bg-white text-black px-6 py-3 font-black text-xs uppercase hover:bg-neon-pink hover:text-white transition-all transform active:scale-95">ADICIONAR</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            } catch (error) {
+                console.error("Erro ao carregar produtos:", error);
+                grid.innerHTML = '<div class="col-span-full text-center py-20 text-red-500 uppercase tracking-widest">Erro ao carregar o arsenal. Verifique a configuração do Firebase.</div>';
+            }
             updateCartCount();
         }
 
-        function addToCart(product) {
+        window.addToCart = function(product) {
             let cart = JSON.parse(localStorage.getItem('cart') || '[]');
             const existing = cart.find(item => item.id === product.id);
             if (existing) {
@@ -113,7 +167,7 @@
             showModal('MARCHA NO PROGRESSO', `${product.name} foi adicionado ao seu carrinho.`);
         }
 
-        function updateCartCount() {
+        window.updateCartCount = function() {
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
             const count = cart.reduce((sum, item) => sum + item.quantity, 0);
             document.querySelectorAll('.cart-count').forEach(el => el.textContent = count);
@@ -126,7 +180,7 @@
             }
         }
 
-        function showModal(title, message, isError = false) {
+        window.showModal = function(title, message, isError = false) {
             const modal = document.getElementById('msg-modal');
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-msg').textContent = message;
@@ -144,13 +198,14 @@
             modal.classList.add('flex');
         }
 
-        function closeModal() {
+        window.closeModal = function() {
             const modal = document.getElementById('msg-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
 
-        window.onload = loadProducts;
+        loadProducts();
     </script>
+
 </body>
 </html>

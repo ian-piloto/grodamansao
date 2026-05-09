@@ -57,6 +57,16 @@
                 </div>
             </form>
 
+            <div class="relative my-8">
+                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/10"></div></div>
+                <div class="relative flex justify-center text-xs uppercase"><span class="bg-[#0a0a0a] px-4 text-zinc-500 font-bold tracking-widest">Ou entre com</span></div>
+            </div>
+
+            <button id="google-login" class="w-full py-4 border border-white/10 rounded-xl flex items-center justify-center gap-3 hover:bg-white/5 transition-all active:scale-[0.98] font-bold uppercase text-xs tracking-widest">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
+                Conta Google
+            </button>
+
             <div class="mt-8 text-center">
                 <p class="text-zinc-500 text-sm italic">Não tem conta? <a href="cadastro.html" class="text-white underline hover:text-neon-green transition-colors">Cadastre-se aqui</a></p>
             </div>
@@ -70,14 +80,17 @@
             <span id="modal-icon" class="material-symbols-outlined text-neon-green text-5xl mb-4">check_circle</span>
             <h3 id="modal-title" class="font-headline-md text-xl uppercase mb-2">MESSAGEM</h3>
             <p id="modal-msg" class="text-zinc-500 text-sm mb-8">Descrição da mensagem aqui.</p>
-            <button id="modal-btn" onclick="closeModal()" class="w-full py-4 bg-white text-black font-black uppercase tracking-widest hover:bg-zinc-200 transition-all">ENTENDIDO</button>
+            <button id="modal-btn" class="w-full py-4 bg-white text-black font-black uppercase tracking-widest hover:bg-zinc-200 transition-all">ENTENDIDO</button>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { auth, googleProvider } from './firebase-config.js';
+        import { signInWithEmailAndPassword, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
         let redirectUrl = null;
 
-        function showModal(title, message, isError = false, redirect = null) {
+        window.showModal = function(title, message, isError = false, redirect = null) {
             const modal = document.getElementById('msg-modal');
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-msg').textContent = message;
@@ -100,36 +113,55 @@
             modal.classList.add('flex');
         }
 
-        function closeModal() {
+        window.closeModal = function() {
             const modal = document.getElementById('msg-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
             if (redirectUrl) window.location.href = redirectUrl;
         }
 
+        document.getElementById('modal-btn').onclick = closeModal;
+
+        // Login com Email/Senha
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
             try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const result = await response.json();
-                if (response.ok) {
-                    localStorage.setItem('user', JSON.stringify(result.user));
-                    showModal('BEM VINDO!', 'Acesso autorizado. Aproveite a Mansão!', false, 'index.html');
-                } else {
-                    showModal('ACESSO NEGADO', result.error, true);
-                }
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                localStorage.setItem('user', JSON.stringify({ 
+                    uid: user.uid, 
+                    name: user.displayName || user.email, 
+                    email: user.email 
+                }));
+                showModal('BEM VINDO!', 'Acesso autorizado. Aproveite a Mansão!', false, 'index.html');
             } catch (error) {
-                showModal('ERRO', 'Conexão falhou.', true);
+                let errorMsg = "Erro ao fazer login.";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                    errorMsg = "E-mail ou senha incorretos.";
+                }
+                showModal('ACESSO NEGADO', errorMsg, true);
+            }
+        });
+
+        // Login com Google
+        document.getElementById('google-login').addEventListener('click', async () => {
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
+                localStorage.setItem('user', JSON.stringify({ 
+                    uid: user.uid, 
+                    name: user.displayName, 
+                    email: user.email 
+                }));
+                showModal('BEM VINDO!', `Olá \${user.displayName}! Acesso autorizado.`, false, 'index.html');
+            } catch (error) {
+                showModal('ERRO', 'Falha no login com Google.', true);
             }
         });
     </script>
+
 </body>
 </html>

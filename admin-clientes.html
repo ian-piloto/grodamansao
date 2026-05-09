@@ -55,27 +55,46 @@
         </div>
     </div>
 
-    <script>
-        async function loadUsers() {
-            const response = await fetch('/api/users');
-            const users = await response.json();
-            const tbody = document.getElementById('user-list');
-            tbody.innerHTML = '';
+    <script type="module">
+        import { db } from './firebase-config.js';
+        import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-            users.forEach(user => {
-                tbody.innerHTML += `
-                    <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                        <td class="p-6 text-zinc-500 text-sm font-mono">#${user.id}</td>
-                        <td class="p-6 font-bold uppercase tracking-tight">${user.name}</td>
-                        <td class="p-6 text-zinc-400">${user.email}</td>
-                        <td class="p-6 text-neon-green font-mono text-sm">${user.phone || 'N/A'}</td>
-                        <td class="p-6 text-zinc-500 text-xs">${new Date(user.created_at).toLocaleDateString('pt-BR')}</td>
-                    </tr>
-                `;
-            });
+        async function loadUsers() {
+            const tbody = document.getElementById('user-list');
+            tbody.innerHTML = '<tr><td colspan="5" class="p-20 text-center text-zinc-500 animate-pulse uppercase tracking-widest">Carregando Base de Dados...</td></tr>';
+            
+            try {
+                // Busca usuários na coleção 'users' ordenados por data (se disponível)
+                const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                tbody.innerHTML = '';
+
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="p-20 text-center text-zinc-600 uppercase tracking-widest">NENHUM MEMBRO CADASTRADO AINDA</td></tr>';
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const user = doc.data();
+                    tbody.innerHTML += `
+                        <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                            <td class="p-6 text-zinc-500 text-sm font-mono">#${doc.id.substring(0, 6)}</td>
+                            <td class="p-6 font-bold uppercase tracking-tight">${user.name}</td>
+                            <td class="p-6 text-zinc-400">${user.email}</td>
+                            <td class="p-6 text-neon-green font-mono text-sm">${user.phone || 'N/A'}</td>
+                            <td class="p-6 text-zinc-500 text-xs">${user.createdAt ? new Date(user.createdAt).toLocaleDateString('pt-BR') : 'N/A'}</td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error("Erro ao carregar usuários:", error);
+                tbody.innerHTML = '<tr><td colspan="5" class="p-20 text-center text-red-500 uppercase tracking-widest">Erro ao carregar base de clientes.</td></tr>';
+            }
         }
 
-        window.onload = loadUsers;
+        loadUsers();
     </script>
+
 </body>
 </html>

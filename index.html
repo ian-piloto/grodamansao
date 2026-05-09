@@ -135,39 +135,54 @@
 <span id="user-name" class="hidden text-xs font-bold uppercase tracking-widest text-neon-green"></span>
 </div>
 
-<script>
-    function updateNavbar() {
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-        document.querySelectorAll('.cart-count').forEach(el => el.textContent = count);
+    <script type="module">
+        import { auth } from './firebase-config.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user) {
-            document.getElementById('user-name').textContent = user.name.split(' ')[0];
-            document.getElementById('user-name').classList.remove('hidden');
-            document.getElementById('user-btn').textContent = 'account_circle';
+        function updateNavbar(user) {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.querySelectorAll('.cart-count').forEach(el => el.textContent = count);
+
+            if (user) {
+                document.getElementById('user-name').textContent = (user.displayName || user.email).split(' ')[0];
+                document.getElementById('user-name').classList.remove('hidden');
+                document.getElementById('user-btn').textContent = 'account_circle';
+            } else {
+                document.getElementById('user-name').classList.add('hidden');
+                document.getElementById('user-btn').textContent = 'person';
+            }
         }
-    }
 
-    function showModal(title, message, isError = false) {
-        const modal = document.getElementById('msg-modal');
-        document.getElementById('modal-title').textContent = title;
-        document.getElementById('modal-msg').textContent = message;
-        const icon = document.getElementById('modal-icon');
-        icon.textContent = isError ? 'error' : 'check_circle';
-        icon.className = `material-symbols-outlined text-4xl \${isError ? 'text-red-500' : 'text-neon-pink'}`;
-        
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    }
+        window.showModal = function(title, message, isError = false) {
+            const modal = document.getElementById('msg-modal');
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-msg').textContent = message;
+            const icon = document.getElementById('modal-icon');
+            icon.textContent = isError ? 'error' : 'check_circle';
+            icon.className = `material-symbols-outlined text-4xl \${isError ? 'text-red-500' : 'text-neon-pink'}`;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
 
-    function closeModal() {
-        const modal = document.getElementById('msg-modal');
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    }
-    window.onload = updateNavbar;
-</script>
+        window.closeModal = function() {
+            const modal = document.getElementById('msg-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            updateNavbar(user);
+        });
+
+        // Ouvir mudanças no localStorage (carrinho)
+        window.addEventListener('storage', () => {
+            const user = auth.currentUser;
+            updateNavbar(user);
+        });
+    </script>
+
 </header>
 <main class="pt-20">
 <!-- Hero Section -->

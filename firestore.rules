@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Permite leitura pública de produtos
+    match /products/{product} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Usuários podem ler e escrever seus próprios perfis
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Pedidos podem ser criados por qualquer um (checkout), mas lidos apenas por admins (ou autenticados)
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read: if request.auth != null;
+    }
+  }
+}
