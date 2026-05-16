@@ -80,16 +80,13 @@
         </div>
     </div>
 
-    <script type="module">
-        import { db } from './firebase-config.js';
-        import { collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
-        window.toggleModal = function(id) {
+    <script>
+        function toggleModal(id) {
             document.getElementById(id).classList.toggle('hidden');
             document.getElementById(id).classList.toggle('flex');
         }
 
-        window.showMsgModal = function(title, message, isError = false) {
+        function showMsgModal(title, message, isError = false) {
             const modal = document.getElementById('msg-modal');
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-msg').textContent = message;
@@ -110,44 +107,37 @@
             modal.classList.add('flex');
         }
 
-        window.closeMsgModal = function() {
+        function closeMsgModal() {
             const modal = document.getElementById('msg-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
 
         async function loadAdminProducts() {
+            const response = await fetch('/api/products');
+            const products = await response.json();
             const grid = document.getElementById('admin-product-list');
-            grid.innerHTML = '<div class="col-span-full text-center py-20 text-zinc-500 animate-pulse uppercase tracking-widest">Carregando Inventário...</div>';
-            
-            try {
-                const querySnapshot = await getDocs(collection(db, "products"));
-                grid.innerHTML = '';
+            grid.innerHTML = '';
 
-                querySnapshot.forEach((docSnap) => {
-                    const product = { id: docSnap.id, ...docSnap.data() };
-                    grid.innerHTML += `
-                        <div class="glass-card p-6 rounded-2xl flex flex-col gap-4 group transition-all hover:border-white/20">
-                            <div class="aspect-square bg-black/40 rounded-xl overflow-hidden flex items-center justify-center p-8">
-                                <img src="${product.image_url}" class="w-full h-full object-contain filter group-hover:scale-110 transition-transform duration-500">
-                            </div>
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-xl uppercase">${product.name}</h3>
-                                    <p class="text-zinc-500 text-sm">R$ ${product.price.toFixed(2)}</p>
-                                </div>
-                                <span class="text-[10px] font-black bg-zinc-800 px-3 py-1 uppercase">${product.tag}</span>
-                            </div>
-                            <div class="flex gap-2 pt-4">
-                                <button onclick="confirmDelete('${product.id}')" class="flex-1 py-3 border border-red-500/30 text-red-500 text-[10px] font-bold uppercase tracking-widest hover:bg-red-500/10 transition-all">DELETAR</button>
-                            </div>
+            products.forEach(product => {
+                grid.innerHTML += `
+                    <div class="glass-card p-6 rounded-2xl flex flex-col gap-4 group transition-all hover:border-white/20">
+                        <div class="aspect-square bg-black/40 rounded-xl overflow-hidden flex items-center justify-center p-8">
+                            <img src="${product.image_url}" class="w-full h-full object-contain filter group-hover:scale-110 transition-transform duration-500">
                         </div>
-                    `;
-                });
-            } catch (error) {
-                console.error(error);
-                grid.innerHTML = '<div class="col-span-full text-center py-20 text-red-500">Erro ao carregar produtos.</div>';
-            }
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-bold text-xl uppercase">${product.name}</h3>
+                                <p class="text-zinc-500 text-sm">R$ ${product.price}</p>
+                            </div>
+                            <span class="text-[10px] font-black bg-zinc-800 px-3 py-1 uppercase">${product.tag}</span>
+                        </div>
+                        <div class="flex gap-2 pt-4">
+                            <button onclick="confirmDelete(${product.id})" class="flex-1 py-3 border border-red-500/30 text-red-500 text-[10px] font-bold uppercase tracking-widest hover:bg-red-500/10 transition-all">DELETAR</button>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
         document.getElementById('product-form').addEventListener('submit', async (e) => {
@@ -158,35 +148,39 @@
                 description: document.getElementById('description').value,
                 tag: document.getElementById('tag').value,
                 glow_color: document.getElementById('glow_color').value,
-                image_url: document.getElementById('image_url').value,
-                createdAt: new Date().toISOString()
+                image_url: document.getElementById('image_url').value
             };
 
-            try {
-                await addDoc(collection(db, "products"), data);
+            const response = await fetch('/api/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
                 showMsgModal('MARCHA!', 'Produto adicionado com sucesso ao inventário.');
                 toggleModal('modal');
                 loadAdminProducts();
                 document.getElementById('product-form').reset();
-            } catch (error) {
+            } else {
                 showMsgModal('ERRO', 'Não foi possível cadastrar o produto.', true);
             }
         });
 
-        window.confirmDelete = async function(id) {
+        async function confirmDelete(id) {
+            // Simplificando o confirm para usar o nativo por enquanto, mas o sucesso vai no modal
             if (confirm('VISÃO: Tem certeza que quer remover esse goró?')) {
-                try {
-                    await deleteDoc(doc(db, "products", id));
+                const response = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+                if (response.ok) {
                     showMsgModal('REMOVIDO', 'O produto foi excluído da Mansão.');
                     loadAdminProducts();
-                } catch (error) {
+                } else {
                     showMsgModal('ERRO', 'Erro ao deletar produto.', true);
                 }
             }
         }
 
-        loadAdminProducts();
+        window.onload = loadAdminProducts;
     </script>
-
 </body>
 </html>

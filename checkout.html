@@ -168,15 +168,12 @@
         </div>
     </div>
 
-    <script type="module">
-        import { db } from './firebase-config.js';
-        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
+    <script>
         let currentShipping = 0;
         let currentPayment = 'pix';
         let redirectUrl = null;
 
-        window.renderCart = function() {
+        function renderCart() {
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
             const user = JSON.parse(localStorage.getItem('user'));
             
@@ -207,9 +204,9 @@
                             <h3 class="font-black uppercase text-lg">${item.name}</h3>
                             <div class="flex items-center justify-between mt-2">
                                 <div class="flex items-center gap-4 border border-white/10 px-3 py-1 rounded-full text-sm">
-                                    <button onclick="changeQty('${item.id}', -1)">-</button>
+                                    <button onclick="changeQty(${item.id}, -1)">-</button>
                                     <span class="font-black">${item.quantity}</span>
-                                    <button onclick="changeQty('${item.id}', 1)">+</button>
+                                    <button onclick="changeQty(${item.id}, 1)">+</button>
                                 </div>
                                 <span class="font-black">R$ ${(item.price * item.quantity).toFixed(2)}</span>
                             </div>
@@ -228,7 +225,7 @@
             document.getElementById('total-price').textContent = `R$ ${total.toFixed(2)}`;
         }
 
-        window.changeQty = function(id, delta) {
+        function changeQty(id, delta) {
             let cart = JSON.parse(localStorage.getItem('cart') || '[]');
             const idx = cart.findIndex(i => i.id === id);
             if (idx > -1) {
@@ -239,20 +236,20 @@
             }
         }
 
-        window.setShipping = function(val) {
+        function setShipping(val) {
             currentShipping = val;
             document.getElementById('ship-sedex').classList.toggle('glow-active', val === 22);
             document.getElementById('ship-eco').classList.toggle('glow-active', val === 0);
             renderCart();
         }
 
-        window.setPayment = function(method) {
+        function setPayment(method) {
             currentPayment = method;
             document.getElementById('pay-pix').classList.add('glow-active');
             renderCart();
         }
 
-        window.showModal = function(title, message, isError = false, redirect = null) {
+        function showModal(title, message, isError = false, redirect = null) {
             const modal = document.getElementById('msg-modal');
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-msg').textContent = message;
@@ -273,18 +270,19 @@
             modal.classList.add('flex');
         }
 
-        window.closeModal = function() {
+        function closeModal() {
             document.getElementById('msg-modal').classList.add('hidden');
             if (redirectUrl) window.location.href = redirectUrl;
         }
 
-        window.calculateFreight = async function() {
+        async function calculateFreight() {
             const cep = document.getElementById('cust-cep').value.replace(/\D/g, '');
             if (cep.length !== 8) {
                 return showModal('CEP INVÁLIDO', 'Digita os 8 números do CEP aí, cria.', true);
             }
 
             try {
+                // ViaCEP integration
                 const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
                 const data = await response.json();
 
@@ -296,6 +294,7 @@
                 document.getElementById('cust-city').value = data.localidade;
                 document.getElementById('cust-uf').value = data.uf;
 
+                // Mock freight calculation logic
                 const mockFreight = (parseInt(cep.substring(0,2)) % 10) + 15;
                 setShipping(mockFreight);
                 
@@ -305,15 +304,14 @@
             }
         }
 
-        window.finishOrder = async function() {
+        async function finishOrder() {
             const name = document.getElementById('cust-name').value;
             const email = document.getElementById('cust-email').value;
             const cep = document.getElementById('cust-cep').value;
             const address = document.getElementById('cust-address').value;
             const number = document.getElementById('cust-number').value;
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            const totalText = document.getElementById('total-price').textContent.replace('R$ ', '').replace(',', '.');
-            const total = parseFloat(totalText);
+            const total = parseFloat(document.getElementById('total-price').textContent.replace('R$ ', ''));
 
             if (!name || !email || !cep || !address || !number) {
                 return showModal('DADOS INCOMPLETOS', 'Preencha o seu endereço de entrega completo para o Goró não se perder!', true);
@@ -321,34 +319,26 @@
             if (cart.length === 0) return showModal('VAZIO!', 'Escolha uns gorós no catálogo primeiro.', true);
 
             try {
-                // Gravar pedido no Firestore
-                const docRef = await addDoc(collection(db, "orders"), {
-                    customer_name: name,
-                    customer_email: email,
-                    items: cart,
-                    total_price: total,
-                    status: 'PENDING',
-                    shipping_cost: currentShipping,
-                    address: {
-                        cep, address, number, 
-                        city: document.getElementById('cust-city').value,
-                        uf: document.getElementById('cust-uf').value
-                    },
-                    createdAt: new Date().toISOString()
+                const response = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        name, email, cart, total, 
+                        shipping: currentShipping,
+                        address_details: { cep, address, number, city: document.getElementById('cust-city').value }
+                    })
                 });
-
-                if (docRef.id) {
-                    showModal('MARCHA NO PROGRESSO!', `Pedido realizado com sucesso. Prepare-se para o sabor!`, false, 'index.html');
+                const result = await response.json();
+                if (result.orderId) {
+                    showModal('MARCHA NO PROGRESSO!', `Pedido #${result.orderId} realizado com sucesso. Prepare-se para o sabor!`, false, 'index.html');
                     localStorage.removeItem('cart');
                 }
             } catch (e) {
-                console.error(e);
-                showModal('ERRO', 'Falha ao processar pedido no Firebase.', true);
+                showModal('ERRO', 'Conexão falhou ao processar pedido.', true);
             }
         }
 
-        renderCart();
+        window.onload = renderCart;
     </script>
-
 </body>
 </html>

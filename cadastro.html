@@ -89,14 +89,10 @@
         </div>
     </div>
 
-    <script type="module">
-        import { auth, db } from './firebase-config.js';
-        import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
+    <script>
         let redirectUrl = null;
 
-        window.showModal = function(title, message, isError = false, redirect = null) {
+        function showModal(title, message, isError = false, redirect = null) {
             const modal = document.getElementById('msg-modal');
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-msg').textContent = message;
@@ -119,14 +115,12 @@
             modal.classList.add('flex');
         }
 
-        window.closeModal = function() {
+        function closeModal() {
             const modal = document.getElementById('msg-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
             if (redirectUrl) window.location.href = redirectUrl;
         }
-
-        document.getElementById('modal-btn').onclick = closeModal;
 
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -136,39 +130,22 @@
             const phone = document.getElementById('phone').value;
 
             try {
-                // 1. Criar usuário no Auth
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-
-                // 2. Atualizar perfil com o nome
-                await updateProfile(user, { displayName: name });
-
-                // 3. Salvar dados extras no Firestore
-                await setDoc(doc(db, "users", user.uid), {
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    createdAt: new Date().toISOString()
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, phone })
                 });
 
-                localStorage.setItem('user', JSON.stringify({ 
-                    uid: user.uid, 
-                    name: name, 
-                    email: email 
-                }));
-
-                showModal('MARCHA NO PROGRESSO!', 'Cadastro realizado com sucesso. Bem-vindo à elite!', false, 'index.html');
-            } catch (error) {
-                let errorMsg = "Erro ao realizar cadastro.";
-                if (error.code === 'auth/email-already-in-use') {
-                    errorMsg = "Este e-mail já está em uso.";
-                } else if (error.code === 'auth/weak-password') {
-                    errorMsg = "A senha deve ter pelo menos 6 caracteres.";
+                const result = await response.json();
+                if (response.ok) {
+                    showModal('MARCHA NO PROGRESSO!', 'Cadastro realizado com sucesso. Bem-vindo à elite!', false, 'index.html');
+                } else {
+                    showModal('OPS!', result.error, true);
                 }
-                showModal('OPS!', errorMsg, true);
+            } catch (error) {
+                showModal('ERRO', 'Conexão falhou.', true);
             }
         });
     </script>
-
 </body>
 </html>

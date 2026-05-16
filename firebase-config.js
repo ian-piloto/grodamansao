@@ -1,21 +1,23 @@
-// firebase-config.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+require('dotenv').config();
+const admin = require('firebase-admin');
 
-// Substitua as informações abaixo pelas chaves do seu projeto no Firebase Console
-// Configurações do Projeto > Geral > Seus aplicativos > SDK setup and configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyCYCHv3WzTc8a9yS3ufqCtb-2JFSKXVHRc",
-  authDomain: "gorodamansao.firebaseapp.com",
-  projectId: "gorodamansao",
-  storageBucket: "gorodamansao.appspot.com",
-  messagingSenderId: "1055555555555", // Valor temporário (seria ideal o real)
-  appId: "1:1055555555555:web:abcdef123456" // Valor temporário (seria ideal o real)
-};
+if (!process.env.FIREBASE_PROJECT_ID) {
+    console.warn("⚠️  Variáveis de ambiente do Firebase não encontradas. O sistema não funcionará corretamente até que você preencha o arquivo .env.");
+} else {
+    try {
+        admin.initializeApp({
+            credential: admin.credential.cert({
+                projectId: process.env.FIREBASE_PROJECT_ID,
+                privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+                clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+            })
+        });
+        console.log("🔥 Firebase Admin inicializado com sucesso.");
+    } catch (error) {
+        console.error("❌ Erro ao inicializar Firebase:", error.message);
+    }
+}
 
+const db = admin.apps.length ? admin.firestore() : null;
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const googleProvider = new GoogleAuthProvider();
+module.exports = { db, admin };

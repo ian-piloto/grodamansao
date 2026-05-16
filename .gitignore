@@ -1,6 +1,7 @@
 node_modules/
 .DS_Store
 *.log
-.vercel
+.env
+*.sqlite
+*.sqlite-journal
 .agent/
-.firebase/
